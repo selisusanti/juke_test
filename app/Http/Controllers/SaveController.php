@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Models\Userslist;
 use App\Services\Response;
+use App\Exceptions\ApplicationException;
+use DB;
 
 class SaveController extends Controller
 {
@@ -20,20 +22,28 @@ class SaveController extends Controller
      * untuk simpan data package 
     */
     public function save(Request $request){
-        $data           = $this->listData($request);
+        
+        DB::beginTransaction();
+        try {  
+            $data           = $this->listData($request);
 
-        if(!empty($data)){
-            foreach($data as $row){
-                $save = Userslist::create([
-                    'userId'            => $row->userId,
-                    'id'                => $row->id,
-                    'title'             => $row->title,
-                    'completed'         => $row->completed,
-                ]);
+            if(!empty($data)){
+                foreach($data as $row){
+                    $save = Userslist::create([
+                        'userId'            => $row->userId,
+                        'title'             => $row->title,
+                        'completed'         => $row->completed,
+                    ]);
+                }
             }
+
+            DB::commit();
+            return Response::success("Save Data Success");
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new ApplicationException("error.error_save");
         }
         
-        return Response::success("Save Data Success");
     }
 
     /**
@@ -43,7 +53,6 @@ class SaveController extends Controller
         $data           = $this->userService->getDataList();
         return $data;
     }
-
 
 
 
