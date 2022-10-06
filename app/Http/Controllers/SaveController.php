@@ -41,7 +41,7 @@ class SaveController extends Controller
             return Response::success("Save Data Success");
         } catch (Exception $e) {
             DB::rollBack();
-            throw new ApplicationException("error.error_save");
+            return Response::error($e, 500);
         }
         
     }
