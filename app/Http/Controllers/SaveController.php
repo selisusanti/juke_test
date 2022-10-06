@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\UserService;
+use App\Services\TestService;
 use App\Models\Userslist;
 use App\Services\Response;
 use App\Exceptions\ApplicationException;
@@ -12,10 +12,10 @@ use DB;
 class SaveController extends Controller
 {
 
-    private $userService;
+    private $testService;
 
     public function __construct(){
-        $this->userService = new UserService();
+        $this->testService = new TestService();
     }
 
     /**
@@ -23,12 +23,13 @@ class SaveController extends Controller
     */
     public function save(Request $request){
         
+
         DB::beginTransaction();
         try {  
             $data           = $this->listData($request);
 
-            if(!empty($data)){
-                foreach($data as $row){
+            if(!empty($data->data)){
+                foreach($data->data as $row){
                     $save = Userslist::create([
                         'userId'            => $row->userId,
                         'title'             => $row->title,
@@ -50,7 +51,7 @@ class SaveController extends Controller
      * untuk simpan data package 
     */
     public function listData($request){
-        $data           = $this->userService->getDataList();
+        $data           = $this->testService->coba();
         return $data;
     }
 
